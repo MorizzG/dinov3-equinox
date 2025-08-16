@@ -5,14 +5,16 @@ import sys
 from argparse import ArgumentParser
 from pathlib import Path
 
-from dinov3.hub.backbones import (
-    dinov3_vit7b16,
-    dinov3_vitb16,
-    dinov3_vith16plus,
-    dinov3_vitl16,
-    dinov3_vits16,
-    dinov3_vits16plus,
-)
+import torch
+
+# from dinov3.hub.backbones import (
+#     dinov3_vit7b16,
+#     dinov3_vitb16,
+#     dinov3_vith16plus,
+#     dinov3_vitl16,
+#     dinov3_vits16,
+#     dinov3_vits16plus,
+# )
 from safetensors.torch import save_file
 
 Model = Literal["vit7b16", "vitb16", "vith16plus", "vitl16", "vitl16plus", "vits16", "vits16plus"]
@@ -35,8 +37,15 @@ def fix_state_dict(state_dict: dict) -> dict:
     return fixed_state_dict
 
 
-def convert_model(model: Model, weight_folder: Path):
-    model_out_file = f"models/{model}.safetensors"
+def convert_model(model: Model, weight_folder: Path, dest_folder: str):
+    dest_folder_ = Path(dest_folder)
+
+    if not dest_folder_.exists():
+        print(f"dest_folder {dest_folder} does not exist")
+        return
+
+    # model_out_file = f"{dest_folder}/{model}.safetensors"
+    model_out_file = dest_folder_ / f"{model}.safetensors"
 
     if Path(model_out_file).exists():
         print(f"model file for model {model} ({model_out_file}) already exists, skipping")
@@ -47,23 +56,27 @@ def convert_model(model: Model, weight_folder: Path):
 
     match model:
         case "vit7b16":
-            dino = dinov3_vit7b16(
-                pretrained=True,
+            dino = torch.hub.load(
+                "facebookresearch/dinov3",
+                "dinov3_vit7b16",
                 weights=str(weight_folder / "dinov3_vit7b16_pretrain_lvd1689m-a955f4ea.pth"),
             )
         case "vitb16":
-            dino = dinov3_vitb16(
-                pretrained=True,
+            dino = torch.hub.load(
+                "facebookresearch/dinov3",
+                "dinov3_vitb16",
                 weights=str(weight_folder / "dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth"),
             )
         case "vith16plus":
-            dino = dinov3_vith16plus(
-                pretrained=True,
+            dino = torch.hub.load(
+                "facebookresearch/dinov3",
+                "dinov3_vith16plus",
                 weights=str(weight_folder / "dinov3_vith16plus_pretrain_lvd1689m-7c1da9a5.pth"),
             )
         case "vitl16":
-            dino = dinov3_vitl16(
-                pretrained=True,
+            dino = torch.hub.load(
+                "facebookresearch/dinov3",
+                "dinov3_vitl16",
                 weights=str(weight_folder / "dinov3_vitl16_pretrain_lvd1689m-8aa4cbdd.pth"),
             )
         # case "vitl16plus":
@@ -72,17 +85,21 @@ def convert_model(model: Model, weight_folder: Path):
         #         weights="???",
         #     )
         case "vits16":
-            dino = dinov3_vits16(
-                pretrained=True,
+            dino = torch.hub.load(
+                "facebookresearch/dinov3",
+                "dinov3_vits16",
                 weights=str(weight_folder / "dinov3_vits16_pretrain_lvd1689m-08c60483.pth"),
             )
         case "vits16plus":
-            dino = dinov3_vits16plus(
-                pretrained=True,
+            dino = torch.hub.load(
+                "facebookresearch/dinov3",
+                "dinov3_vits16plus",
                 weights=str(weight_folder / "dinov3_vits16plus_pretrain_lvd1689m-4057cbaa.pth"),
             )
         case _:
             raise NotImplementedError
+
+    assert isinstance(dino, torch.nn.Module)
 
     print("fixing state dict")
 
@@ -101,6 +118,7 @@ if __name__ == "__main__":
     parser.add_argument("--model", type=str, choices=list(typing.get_args(Model)) + ["all"])
 
     parser.add_argument("--weight-folder", type=str, default="/media/LinuxData/models/dinov3")
+    parser.add_argument("--dest-folder", type=str, default="./models.")
 
     args = parser.parse_args()
 
@@ -112,10 +130,18 @@ if __name__ == "__main__":
 
     if args.model == "all":
         for model in typing.get_args(Model):
-            convert_model(model, weight_folder)
+            convert_model(
+                model,
+                weight_folder=weight_folder,
+                dest_folder=args.dest_folder,
+            )
     else:
         model: Model = args.model
 
         assert model in typing.get_args(Model)
 
-        convert_model(model, weight_folder)
+        convert_model(
+            model,
+            weight_folder=weight_folder,
+            dest_folder=args.dest_folder,
+        )
