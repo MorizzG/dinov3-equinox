@@ -17,7 +17,7 @@ import torch
 # )
 from safetensors.torch import save_file
 
-Model = Literal["vit7b16", "vitb16", "vith16plus", "vitl16", "vitl16plus", "vits16", "vits16plus"]
+Model = Literal["vit7b16", "vitb16", "vith16plus", "vitl16", "vits16", "vits16plus"]
 
 
 def fix_state_dict(state_dict: dict) -> dict:
