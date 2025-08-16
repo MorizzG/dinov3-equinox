@@ -1,0 +1,57 @@
+[project]
+name = "dinov3-equinox"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "chex>=0.1.90",
+    "dinov3",
+    "equinox>=0.13.0",
+    "jax[cuda]>=0.7.0",
+    "jaxtyping>=0.3.2",
+    "matplotlib>=3.10.5",
+    "numpy>=2.3.2",
+    "packaging>=25.0",
+    "pyqt6>=6.9.1",
+    "safetensors[numpy,torch]>=0.6.2",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[tool.hatch.build]
+include = ["dinov3_equinox/*"]
+
+[dependency-groups]
+dev = ["ipython>=9.4.0"]
+
+[tool.uv.sources]
+dinov3 = { path = "../dinov3" }
+
+
+[tool.isort]
+line_length = 100
+profile = "black"
+known_typing = "typing,collections.abc,jaxtyping"
+# default: "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
+sections = "FUTURE,TYPING,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
+# skip_glob = [""]  # files/folders/... to skip
+# known_first_party = [""]  # packages that are forced as first party
+known_third_party = ["wandb"] # packages that are forced as third party
+# src_paths = [""]  # files inside these paths are treated as first party
+# multi_line_output = 5
+float_to_top = true
+group_by_package = true
+combine_as_imports = true
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = ["F722"]
+
+[tool.pyrefly]
+project-includes = ["**/*"]
+project-excludes = ["**/*venv/**/*"]
