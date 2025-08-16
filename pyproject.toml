@@ -27,7 +27,7 @@ include = ["dinov3_equinox/*"]
 dev = ["ipython>=9.4.0"]
 
 [tool.uv.sources]
-dinov3 = { path = "../dinov3" }
+dinov3 = { git = "https://github.com/facebookresearch/dinov3" }
 
 
 [tool.isort]

@@ -2,8 +2,6 @@ from jaxtyping import PRNGKeyArray
 
 from .vit import DinoVisionTransformer as DinoVisionTransformer
 
-# dinov3_vits16,
-
 
 def dinov3_vits16(*, key: PRNGKeyArray) -> DinoVisionTransformer:
     return DinoVisionTransformer(
