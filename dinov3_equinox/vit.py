@@ -45,6 +45,7 @@ class DinoVisionTransformer(eqx.Module):
     norm: nn.LayerNorm
 
     cls_norm: nn.LayerNorm | None
+    local_cls_norm: nn.LayerNorm | None
 
     def __init__(
         self,
@@ -149,6 +150,11 @@ class DinoVisionTransformer(eqx.Module):
             self.cls_norm = make_norm_layer(norm_layer, embed_dim)
         else:
             self.cls_norm = None
+
+        if untie_global_and_local_cls_norm:
+            self.local_cls_norm = make_norm_layer(norm_layer, embed_dim)
+        else:
+            self.local_cls_norm = None
 
     def __call__(
         self, img: Float[Array, "c h w"], *, return_hidden: bool = False
