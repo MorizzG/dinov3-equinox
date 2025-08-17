@@ -4,13 +4,9 @@ import equinox as eqx
 import equinox.nn as nn
 import jax.numpy as jnp
 
-from dinov3_equinox.act import GeLU
-from dinov3_equinox.ff import Mlp, SwiGLUFFN
-from dinov3_equinox.types import (
-    ActLayer,
-    FFNLayer,
-    NormLayer,
-)
+from .act import GeLU
+from .ff import Mlp, SwiGLUFFN
+from .types import ActLayer, FFNLayer, NormLayer
 
 STR_TO_DTYPE = {
     "fp32": jnp.float32,

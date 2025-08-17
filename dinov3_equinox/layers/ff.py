@@ -6,8 +6,8 @@ import equinox.nn as nn
 import jax
 import jax.random as jr
 
-from dinov3_equinox.act import GeLU
-from dinov3_equinox.types import (
+from .act import GeLU
+from .types import (
     ActLayer,
 )
 

@@ -6,20 +6,14 @@ import equinox.nn as nn
 import jax
 import jax.numpy as jnp
 import jax.random as jr
-from chex import (
-    assert_axis_dimension,
-    assert_rank,
-)
+from chex import assert_axis_dimension, assert_rank
 
-from dinov3_equinox.attention import SelfAttentionBlock
-from dinov3_equinox.misc import STR_TO_DTYPE, make_norm_layer
-from dinov3_equinox.patch_embed import PatchEmbed
-from dinov3_equinox.rope import RopePositionEmbedding
+from dinov3_equinox.layers.block import SelfAttentionBlock
+from dinov3_equinox.layers.misc import STR_TO_DTYPE, make_norm_layer
+from dinov3_equinox.layers.patch_embed import PatchEmbed
+from dinov3_equinox.layers.rope import RopePositionEmbedding
+from dinov3_equinox.layers.types import FFNLayer, NormLayer
 from dinov3_equinox.safetensors import load_pytree
-from dinov3_equinox.types import (
-    FFNLayer,
-    NormLayer,
-)
 
 
 class DinoVisionTransformer(eqx.Module):

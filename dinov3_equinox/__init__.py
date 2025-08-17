@@ -4,7 +4,7 @@ import equinox.nn as nn
 import jax.random as jr
 
 from .classifier import DinoClassifier as DinoClassifier
-from .vit import DinoVisionTransformer as DinoVisionTransformer
+from .models import DinoVisionTransformer as DinoVisionTransformer
 
 
 def dinov3_vits16(*, key: PRNGKeyArray) -> DinoVisionTransformer:

@@ -1,9 +1,10 @@
-from jaxtyping import Array, Float
+from jaxtyping import Array, Float, PRNGKeyArray
 from typing import Literal
 
 import equinox as eqx
 import jax
 import jax.numpy as jnp
+import jax.random as jr
 from chex import (
     assert_equal_shape_prefix,
     assert_equal_shape_suffix,
@@ -120,19 +121,23 @@ class RopePositionEmbedding(eqx.Module):
         if dtype is not None:
             assert self.periods.dtype == dtype
 
-    def __call__(self, *, H: int, W: int) -> Float[Array, "2 hw d_head"]:
+    def __call__(
+        self, *, H: int, W: int, inference: bool = True, key: PRNGKeyArray | None = None
+    ) -> Float[Array, "2 hw d_head"]:
+        dtype = self.dtype or jnp.float32
+
         match self.normalize_coords:
             case "max":
                 max_HW = max(H, W)
-                coords_h = jnp.arange(0.5, H, dtype=self.dtype) / max_HW
-                coords_w = jnp.arange(0.5, W, dtype=self.dtype) / max_HW
+                coords_h = jnp.arange(0.5, H, dtype=dtype) / max_HW
+                coords_w = jnp.arange(0.5, W, dtype=dtype) / max_HW
             case "min":
                 min_HW = min(H, W)
-                coords_h = jnp.arange(0.5, H, dtype=self.dtype) / min_HW
-                coords_w = jnp.arange(0.5, W, dtype=self.dtype) / min_HW
+                coords_h = jnp.arange(0.5, H, dtype=dtype) / min_HW
+                coords_w = jnp.arange(0.5, W, dtype=dtype) / min_HW
             case "separate":
-                coords_h = jnp.arange(0.5, H, dtype=self.dtype) / H
-                coords_w = jnp.arange(0.5, W, dtype=self.dtype) / W
+                coords_h = jnp.arange(0.5, H, dtype=dtype) / H
+                coords_w = jnp.arange(0.5, W, dtype=dtype) / W
             case _:
                 assert False, f"invalid normalize_coords {self.normalize_coords}"
 
@@ -141,8 +146,54 @@ class RopePositionEmbedding(eqx.Module):
         assert_shape(coords, (H, W, 2))
 
         coords = coords.reshape(-1, 2)
-
         coords = 2.0 * coords - 1.0  # [0, 1]  ->  [-1, 1]
+
+        assert_shape(coords, (H * W, 2))
+
+        # shift coords by adding a uniform value in [-shift, shift]
+        if not inference and self.shift_coords is not None:
+            assert key is not None, "need to pass a key in training mode"
+
+            key, consume = jr.split(key)
+
+            shift_hw = jr.uniform(
+                consume, (2,), minval=-self.shift_coords, maxval=self.shift_coords, dtype=dtype
+            )
+
+            coords += shift_hw[None, :]
+
+        # jitter coords by multiplying the range [-1, 1] by a log-uniform value in [1/jitter,jitter]
+        if not inference and self.jitter_coords is not None:
+            assert key is not None, "need to pass a key in training mode"
+
+            key, consume = jr.split(key)
+
+            jitter_max = jnp.log(self.jitter_coords)
+
+            jitter_min = -jitter_max
+
+            jitter_hw_log = jr.uniform(
+                consume, (2,), minval=jitter_min, maxval=jitter_max, dtype=dtype
+            )
+
+            coords *= jnp.exp(jitter_hw_log)[None, :]
+
+        # Rescale coords by multiplying the range [-1, 1] by a log-uniform value in
+        # [1/rescale, rescale]
+        if not inference and self.rescale_coords is not None:
+            assert key is not None, "need to pass a key in training mode"
+
+            key, consume = jr.split(key)
+
+            rescale_max = jnp.log(self.rescale_coords)
+
+            rescale_min = -rescale_max
+
+            rescale_hw_log = jr.uniform(
+                consume, (1,), minval=rescale_min, maxval=rescale_max, dtype=dtype
+            )
+
+            coords *= jnp.exp(rescale_hw_log)
 
         periods = jax.lax.stop_gradient(self.periods)[None, None, :]
 

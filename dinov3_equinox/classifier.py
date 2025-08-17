@@ -5,7 +5,7 @@ import equinox.nn as nn
 import jax.numpy as jnp
 from chex import assert_axis_dimension, assert_rank, assert_shape
 
-from dinov3_equinox.vit import DinoVisionTransformer
+from dinov3_equinox.models.vit import DinoVisionTransformer
 
 
 class DinoClassifier(eqx.Module):

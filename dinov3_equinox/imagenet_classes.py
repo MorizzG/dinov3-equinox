@@ -15,12 +15,11 @@
 
 from collections import OrderedDict
 
-
 IMAGENET2012_CLASSES = OrderedDict(
     {
         "n01440764": "tench, Tinca tinca",
         "n01443537": "goldfish, Carassius auratus",
-        "n01484850": "great white shark, white shark, man-eater, man-eating shark, Carcharodon carcharias",
+        "n01484850": "great white shark, white shark, man-eater, man-eating shark, Carcharodon carcharias",  # noqa: E501
         "n01491361": "tiger shark, Galeocerdo cuvieri",
         "n01494475": "hammerhead, hammerhead shark",
         "n01496331": "electric ray, crampfish, numbfish, torpedo",
@@ -66,7 +65,7 @@ IMAGENET2012_CLASSES = OrderedDict(
         "n01692333": "Gila monster, Heloderma suspectum",
         "n01693334": "green lizard, Lacerta viridis",
         "n01694178": "African chameleon, Chamaeleo chamaeleon",
-        "n01695060": "Komodo dragon, Komodo lizard, dragon lizard, giant lizard, Varanus komodoensis",
+        "n01695060": "Komodo dragon, Komodo lizard, dragon lizard, giant lizard, Varanus komodoensis",  # noqa: E501
         "n01697457": "African crocodile, Nile crocodile, Crocodylus niloticus",
         "n01698640": "American alligator, Alligator mississipiensis",
         "n01704323": "triceratops",
@@ -121,7 +120,7 @@ IMAGENET2012_CLASSES = OrderedDict(
         "n01860187": "black swan, Cygnus atratus",
         "n01871265": "tusker",
         "n01872401": "echidna, spiny anteater, anteater",
-        "n01873310": "platypus, duckbill, duckbilled platypus, duck-billed platypus, Ornithorhynchus anatinus",
+        "n01873310": "platypus, duckbill, duckbilled platypus, duck-billed platypus, Ornithorhynchus anatinus",  # noqa: E501
         "n01877812": "wallaby, brush kangaroo",
         "n01882714": "koala, koala bear, kangaroo bear, native bear, Phascolarctos cinereus",
         "n01883070": "wombat",
@@ -139,7 +138,7 @@ IMAGENET2012_CLASSES = OrderedDict(
         "n01978287": "Dungeness crab, Cancer magister",
         "n01978455": "rock crab, Cancer irroratus",
         "n01980166": "fiddler crab",
-        "n01981276": "king crab, Alaska crab, Alaskan king crab, Alaska king crab, Paralithodes camtschatica",
+        "n01981276": "king crab, Alaska crab, Alaskan king crab, Alaska king crab, Paralithodes camtschatica",  # noqa: E501
         "n01983481": "American lobster, Northern lobster, Maine lobster, Homarus americanus",
         "n01984695": "spiny lobster, langouste, rock lobster, crawfish, crayfish, sea crawfish",
         "n01985128": "crayfish, crawfish, crawdad, crawdaddy",
@@ -165,7 +164,7 @@ IMAGENET2012_CLASSES = OrderedDict(
         "n02051845": "pelican",
         "n02056570": "king penguin, Aptenodytes patagonica",
         "n02058221": "albatross, mollymawk",
-        "n02066245": "grey whale, gray whale, devilfish, Eschrichtius gibbosus, Eschrichtius robustus",
+        "n02066245": "grey whale, gray whale, devilfish, Eschrichtius gibbosus, Eschrichtius robustus",  # noqa: E501
         "n02071294": "killer whale, killer, orca, grampus, sea wolf, Orcinus orca",
         "n02074367": "dugong, Dugong dugon",
         "n02077923": "sea lion",
@@ -198,7 +197,7 @@ IMAGENET2012_CLASSES = OrderedDict(
         "n02092002": "Scottish deerhound, deerhound",
         "n02092339": "Weimaraner",
         "n02093256": "Staffordshire bullterrier, Staffordshire bull terrier",
-        "n02093428": "American Staffordshire terrier, Staffordshire terrier, American pit bull terrier, pit bull terrier",
+        "n02093428": "American Staffordshire terrier, Staffordshire terrier, American pit bull terrier, pit bull terrier",  # noqa: E501
         "n02093647": "Bedlington terrier",
         "n02093754": "Border terrier",
         "n02093859": "Kerry blue terrier",
@@ -337,7 +336,7 @@ IMAGENET2012_CLASSES = OrderedDict(
         "n02256656": "cicada, cicala",
         "n02259212": "leafhopper",
         "n02264363": "lacewing, lacewing fly",
-        "n02268443": "dragonfly, darning needle, devil's darning needle, sewing needle, snake feeder, snake doctor, mosquito hawk, skeeter hawk",
+        "n02268443": "dragonfly, darning needle, devil's darning needle, sewing needle, snake feeder, snake doctor, mosquito hawk, skeeter hawk",  # noqa: E501
         "n02268853": "damselfly",
         "n02276258": "admiral",
         "n02277742": "ringlet, ringlet butterfly",
@@ -367,7 +366,7 @@ IMAGENET2012_CLASSES = OrderedDict(
         "n02408429": "water buffalo, water ox, Asiatic buffalo, Bubalus bubalis",
         "n02410509": "bison",
         "n02412080": "ram, tup",
-        "n02415577": "bighorn, bighorn sheep, cimarron, Rocky Mountain bighorn, Rocky Mountain sheep, Ovis canadensis",
+        "n02415577": "bighorn, bighorn sheep, cimarron, Rocky Mountain bighorn, Rocky Mountain sheep, Ovis canadensis",  # noqa: E501
         "n02417914": "ibex, Capra ibex",
         "n02422106": "hartebeest",
         "n02422699": "impala, Aepyceros melampus",
@@ -430,7 +429,7 @@ IMAGENET2012_CLASSES = OrderedDict(
         "n02708093": "analog clock",
         "n02727426": "apiary, bee house",
         "n02730930": "apron",
-        "n02747177": "ashcan, trash can, garbage can, wastebin, ash bin, ash-bin, ashbin, dustbin, trash barrel, trash bin",
+        "n02747177": "ashcan, trash can, garbage can, wastebin, ash bin, ash-bin, ashbin, dustbin, trash barrel, trash bin",  # noqa: E501
         "n02749479": "assault rifle, assault gun",
         "n02769748": "backpack, back pack, knapsack, packsack, rucksack, haversack",
         "n02776631": "bakery, bakeshop, bakehouse",
@@ -454,7 +453,7 @@ IMAGENET2012_CLASSES = OrderedDict(
         "n02807133": "bathing cap, swimming cap",
         "n02808304": "bath towel",
         "n02808440": "bathtub, bathing tub, bath, tub",
-        "n02814533": "beach wagon, station wagon, wagon, estate car, beach waggon, station waggon, waggon",
+        "n02814533": "beach wagon, station wagon, wagon, estate car, beach waggon, station waggon, waggon",  # noqa: E501
         "n02814860": "beacon, lighthouse, beacon light, pharos",
         "n02815834": "beaker",
         "n02817516": "bearskin, busby, shako",
@@ -498,7 +497,7 @@ IMAGENET2012_CLASSES = OrderedDict(
         "n02966687": "carpenter's kit, tool kit",
         "n02971356": "carton",
         "n02974003": "car wheel",
-        "n02977058": "cash machine, cash dispenser, automated teller machine, automatic teller machine, automated teller, automatic teller, ATM",
+        "n02977058": "cash machine, cash dispenser, automated teller machine, automatic teller machine, automated teller, automatic teller, ATM",  # noqa: E501
         "n02978881": "cassette",
         "n02979186": "cassette player",
         "n02980441": "castle",
@@ -508,7 +507,7 @@ IMAGENET2012_CLASSES = OrderedDict(
         "n02992529": "cellular telephone, cellular phone, cellphone, cell, mobile phone",
         "n02999410": "chain",
         "n03000134": "chainlink fence",
-        "n03000247": "chain mail, ring mail, mail, chain armor, chain armour, ring armor, ring armour",
+        "n03000247": "chain mail, ring mail, mail, chain armor, chain armour, ring armor, ring armour",  # noqa: E501
         "n03000684": "chain saw, chainsaw",
         "n03014705": "chest",
         "n03016953": "chiffonier, commode",
@@ -1004,7 +1003,7 @@ IMAGENET2012_CLASSES = OrderedDict(
         "n10565667": "scuba diver",
         "n11879895": "rapeseed",
         "n11939491": "daisy",
-        "n12057211": "yellow lady's slipper, yellow lady-slipper, Cypripedium calceolus, Cypripedium parviflorum",
+        "n12057211": "yellow lady's slipper, yellow lady-slipper, Cypripedium calceolus, Cypripedium parviflorum",  # noqa: E501
         "n12144580": "corn",
         "n12267677": "acorn",
         "n12620546": "hip, rose hip, rosehip",
