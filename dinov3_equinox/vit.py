@@ -1,5 +1,5 @@
 from jaxtyping import Array, Float, PRNGKeyArray
-from typing import Literal
+from typing import Literal, Self
 
 import equinox as eqx
 import equinox.nn as nn
@@ -15,6 +15,7 @@ from dinov3_equinox.attention import SelfAttentionBlock
 from dinov3_equinox.misc import STR_TO_DTYPE, make_norm_layer
 from dinov3_equinox.patch_embed import PatchEmbed
 from dinov3_equinox.rope import RopePositionEmbedding
+from dinov3_equinox.safetensors import load_pytree
 from dinov3_equinox.types import (
     FFNLayer,
     NormLayer,
@@ -216,3 +217,6 @@ class DinoVisionTransformer(eqx.Module):
             out["hidden"] = hiddens
 
         return out
+
+    def load_weights(self, path: str) -> Self:
+        return load_pytree(path, self)
