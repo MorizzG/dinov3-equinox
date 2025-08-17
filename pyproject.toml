@@ -4,13 +4,13 @@ version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
     "chex>=0.1.90",
-
     "equinox>=0.13.0",
     "jax[cuda]>=0.7.0",
     "jaxtyping>=0.3.2",
     "matplotlib>=3.10.5",
     "numpy>=2.3.2",
     "packaging>=25.0",
+    "pillow>=11.3.0",
     "pyqt6>=6.9.1",
     "safetensors[numpy,torch]>=0.6.2",
     "torchvision>=0.23.0",

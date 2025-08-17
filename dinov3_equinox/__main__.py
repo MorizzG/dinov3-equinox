@@ -18,6 +18,7 @@ import torch
 from safetensors.torch import save_file
 
 Model = Literal["vit7b16", "vitb16", "vith16plus", "vitl16", "vits16", "vits16plus"]
+Head = Literal["imagenet1k"]
 
 
 def fix_state_dict(state_dict: dict) -> dict:
@@ -37,7 +38,7 @@ def fix_state_dict(state_dict: dict) -> dict:
     return fixed_state_dict
 
 
-def convert_model(model: Model, weight_folder: Path, dest_folder: str):
+def convert_model(model_name: Model, weight_folder: Path, dest_folder: str):
     dest_folder_ = Path(dest_folder)
 
     if not dest_folder_.exists():
@@ -45,16 +46,16 @@ def convert_model(model: Model, weight_folder: Path, dest_folder: str):
         return
 
     # model_out_file = f"{dest_folder}/{model}.safetensors"
-    model_out_file = dest_folder_ / f"{model}.safetensors"
+    model_out_file = dest_folder_ / f"{model_name}.safetensors"
 
     if Path(model_out_file).exists():
-        print(f"model file for model {model} ({model_out_file}) already exists, skipping")
+        print(f"model file for model {model_name} ({model_out_file}) already exists, skipping")
         print("if you wish to re-convert the model, delete the file first")
         return
 
-    print(f"loading model {model}")
+    print(f"loading model {model_name}")
 
-    match model:
+    match model_name:
         case "vit7b16":
             dino = torch.hub.load(
                 "facebookresearch/dinov3",
@@ -97,7 +98,7 @@ def convert_model(model: Model, weight_folder: Path, dest_folder: str):
                 weights=str(weight_folder / "dinov3_vits16plus_pretrain_lvd1689m-4057cbaa.pth"),
             )
         case _:
-            raise NotImplementedError
+            raise ValueError(f"invalid model {model_name}")
 
     assert isinstance(dino, torch.nn.Module)
 
@@ -109,18 +110,67 @@ def convert_model(model: Model, weight_folder: Path, dest_folder: str):
 
     save_file(state_dict, model_out_file)
 
-    print(f"saved converted model {model} in {model_out_file}")
+    print(f"saved converted model {model_name} in {model_out_file}")
 
 
-if __name__ == "__main__":
+def convert_head(head_name: Head, weight_folder: Path, dest_folder: str):
+    dest_folder_ = Path(dest_folder)
+
+    if not dest_folder_.exists():
+        print(f"dest_folder {dest_folder} does not exist")
+        return
+
+    # model_out_file = f"{dest_folder}/{model}.safetensors"
+    model_out_file = dest_folder_ / f"{head_name}.safetensors"
+
+    if Path(model_out_file).exists():
+        print(f"model file for model {head_name} ({model_out_file}) already exists, skipping")
+        print("if you wish to re-convert the model, delete the file first")
+        return
+
+    print(f"loading head {head_name}")
+
+    match head_name:
+        case "imagenet1k":
+            head = torch.nn.Linear(8192, 1000)
+            state_dict = torch.load(
+                weight_folder / "dinov3_vit7b16_imagenet1k_linear_head-90d8ed92.pth"
+            )
+            head.load_state_dict(state_dict)
+        case _:
+            raise ValueError(f"invalid head {head_name}")
+
+    assert isinstance(head, torch.nn.Module)
+
+    print("fixing state dict")
+
+    state_dict = fix_state_dict(head.state_dict())
+
+    print("saving converted model")
+
+    save_file(state_dict, model_out_file)
+
+    print(f"saved converted model {head} in {model_out_file}")
+
+
+def main():
     parser = ArgumentParser()
 
-    parser.add_argument("--model", type=str, choices=list(typing.get_args(Model)) + ["all"])
+    parser.add_argument(
+        "--model", type=str, choices=list(typing.get_args(Model)) + ["all"], required=False
+    )
+    parser.add_argument(
+        "--head", type=str, choices=list(typing.get_args(Head)) + ["all"], required=False
+    )
 
     parser.add_argument("--weight-folder", type=str, default="/media/LinuxData/models/dinov3")
     parser.add_argument("--dest-folder", type=str, default="./models.")
 
     args = parser.parse_args()
+
+    if args.model is None and args.head is None or args.model is not None and args.head is not None:
+        print("need to specify either --model or --head")
+        sys.exit(1)
 
     weight_folder = Path(args.weight_folder)
 
@@ -128,20 +178,43 @@ if __name__ == "__main__":
         print(f"weight folder {weight_folder} does not exist")
         sys.exit(1)
 
-    if args.model == "all":
-        for model in typing.get_args(Model):
+    if args.model is not None:
+        if args.model == "all":
+            for model in typing.get_args(Model):
+                convert_model(
+                    model,
+                    weight_folder=weight_folder,
+                    dest_folder=args.dest_folder,
+                )
+        else:
+            model: Model = args.model
+
+            assert model in typing.get_args(Model)
+
             convert_model(
                 model,
                 weight_folder=weight_folder,
                 dest_folder=args.dest_folder,
             )
-    else:
-        model: Model = args.model
+    elif args.head is not None:
+        if args.head == "all":
+            for head in typing.get_args(Head):
+                convert_head(
+                    head,
+                    weight_folder=weight_folder,
+                    dest_folder=args.dest_folder,
+                )
+        else:
+            head: Head = args.head
 
-        assert model in typing.get_args(Model)
+            assert head in typing.get_args(Head)
 
-        convert_model(
-            model,
-            weight_folder=weight_folder,
-            dest_folder=args.dest_folder,
-        )
+            convert_head(
+                head,
+                weight_folder=weight_folder,
+                dest_folder=args.dest_folder,
+            )
+
+
+if __name__ == "__main__":
+    main()

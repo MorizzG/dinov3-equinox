@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.13"
 resolution-markers = [
     "platform_machine != 'aarch64' or sys_platform != 'linux'",
@@ -136,6 +136,7 @@ dependencies = [
     { name = "matplotlib" },
     { name = "numpy" },
     { name = "packaging" },
+    { name = "pillow" },
     { name = "pyqt6" },
     { name = "safetensors", extra = ["numpy", "torch"] },
     { name = "torchvision" },
@@ -155,6 +156,7 @@ requires-dist = [
     { name = "matplotlib", specifier = ">=3.10.5" },
     { name = "numpy", specifier = ">=2.3.2" },
     { name = "packaging", specifier = ">=25.0" },
+    { name = "pillow", specifier = ">=11.3.0" },
     { name = "pyqt6", specifier = ">=6.9.1" },
     { name = "safetensors", extras = ["numpy", "torch"], specifier = ">=0.6.2" },
     { name = "torchvision", specifier = ">=0.23.0" },

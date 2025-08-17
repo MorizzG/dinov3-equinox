@@ -20,7 +20,7 @@ def as_path(path: str | Path):
     return path
 
 
-def load_file(filename: str | Path, strip_prefix: Optional[str] = None):
+def load_file(filename: str | Path, strip_prefix: Optional[str] = None) -> dict[str, Array]:
     result = {}
 
     with safe_open(filename, framework="flax") as f:

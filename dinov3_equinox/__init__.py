@@ -1,5 +1,9 @@
 from jaxtyping import PRNGKeyArray
 
+import equinox.nn as nn
+import jax.random as jr
+
+from .classifier import DinoClassifier as DinoClassifier
 from .vit import DinoVisionTransformer as DinoVisionTransformer
 
 
@@ -185,3 +189,13 @@ def dinov3_vit7b16(*, key: PRNGKeyArray) -> DinoVisionTransformer:
         untie_global_and_local_cls_norm=True,
         key=key,
     )
+
+
+def dinov3_vit7b16_lc(*, key: PRNGKeyArray) -> DinoClassifier:
+    backbone_key, head_key = jr.split(key)
+
+    backbone = dinov3_vit7b16(key=backbone_key)
+
+    head = nn.Linear(2 * backbone.embed_dim, 1000, key=head_key)
+
+    return DinoClassifier(backbone=backbone, head=head)
