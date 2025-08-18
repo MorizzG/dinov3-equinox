@@ -3,8 +3,10 @@ from jaxtyping import Array, Float, PRNGKeyArray
 import equinox as eqx
 import equinox.nn as nn
 import jax
+import jax.numpy as jnp
 import jax.random as jr
 
+from .act import GeLU
 from .attention import SelfAttention
 from .ff import Mlp, SwiGLUFFN
 from .misc import (
@@ -95,6 +97,53 @@ class SelfAttentionBlock(eqx.Module):
         x = jax.vmap(self.norm2)(x)
         x = self.mlp(x)
         x = self.ls2(x)
+
+        x += res
+
+        return x
+
+
+class ConvNextBlock(eqx.Module):
+    dwconv: nn.Conv2d
+    norm: nn.LayerNorm
+    pwconv1: nn.Linear
+    act: GeLU
+    pwconv2: nn.Linear
+    gamma: Array | None
+
+    def __init__(self, dim: int, *, layer_scale_init_value: float = 1e-6, key: PRNGKeyArray):
+        super().__init__()
+
+        dw_key, pw1_key, pw2_key, gamma_key = jr.split(key, 4)
+
+        self.dwconv = nn.Conv2d(dim, dim, kernel_size=7, padding=3, groups=dim, key=dw_key)
+        self.norm = nn.LayerNorm(dim, eps=1e-6)
+        self.pwconv1 = nn.Linear(dim, 4 * dim, key=pw1_key)
+        self.act = GeLU()
+        self.pwconv2 = nn.Linear(4 * dim, dim, key=pw2_key)
+
+        if layer_scale_init_value > 0:
+            self.gamma = jnp.full(dim, layer_scale_init_value)
+        else:
+            self.gamma = None
+
+    def __call__(
+        self, x: Float[Array, "c h w"], *, key: PRNGKeyArray | None = None
+    ) -> Float[Array, "c h w"]:
+        def c_vmap(f):
+            # apply over c, vmap over h and w
+            return jax.vmap(jax.vmap(f, in_axes=1, out_axes=1), in_axes=2, out_axes=2)
+
+        res = x
+
+        x = self.dwconv(x)
+        x = c_vmap(self.norm)(x)
+        x = c_vmap(self.pwconv1)(x)
+        x = self.act(x)
+        x = c_vmap(self.pwconv2)(x)
+
+        if self.gamma is not None:
+            x *= self.gamma[:, None, None]
 
         x += res
 
