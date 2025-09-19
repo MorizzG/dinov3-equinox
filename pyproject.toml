@@ -5,7 +5,7 @@ requires-python = ">=3.13"
 dependencies = [
     "chex>=0.1.90",
     "equinox>=0.13.0",
-    "jax[cuda]>=0.6.0",
+    "jax>=0.6.0",
     "jaxtyping>=0.3.2",
     "packaging>=25.0",
     "pillow>=11.3.0",
