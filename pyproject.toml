@@ -9,8 +9,14 @@ dependencies = [
     "jaxtyping>=0.3.2",
     "packaging>=25.0",
     "pillow>=11.3.0",
-    "safetensors[numpy,torch]>=0.6.2",
-    "torchvision>=0.23.0",
+    "safetensors[numpy]>=0.6.2",
+]
+
+[project.optional-dependencies]
+torch = [
+    "safetensors[torch]",
+    "torch>=2.8.0",
+    "torchvision>=0.23.0"
 ]
 
 [build-system]
