@@ -1,6 +1,8 @@
 from jaxtyping import Array, Float, PRNGKeyArray
 from typing import Literal, Self
 
+from pathlib import Path
+
 import equinox as eqx
 import equinox.nn as nn
 import jax
@@ -212,5 +214,5 @@ class DinoVisionTransformer(eqx.Module):
 
         return out
 
-    def load_weights(self, path: str) -> Self:
+    def load_weights(self, path: str | Path) -> Self:
         return load_pytree(path, self)
