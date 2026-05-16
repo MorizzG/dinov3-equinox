@@ -1,5 +1,5 @@
 from jaxtyping import Array, PyTree
-from typing import Optional
+from typing import Any, Optional
 
 from pathlib import Path
 
@@ -18,6 +18,22 @@ def as_path(path: str | Path):
         raise ValueError(f"invalid path {path}")
 
     return path
+
+
+def tree_path_to_str(tree_path: tuple[Any, ...]) -> str:
+    path_parts: list[str] = []
+
+    for p in tree_path:
+        if hasattr(p, "name"):
+            path_parts.append(p.name)
+        elif hasattr(p, "idx"):
+            path_parts.append(str(p.idx))
+        else:
+            raise ValueError(f"Don't know how to deal with tree path part {p}")
+
+    path_str = ".".join(path_parts)
+
+    return path_str
 
 
 def load_file(filename: str | Path, strip_prefix: Optional[str] = None) -> dict[str, Array]:
@@ -81,17 +97,7 @@ def load_state_dict(
     new_values = []
 
     for tree_path, value in paths_and_values:
-        path_parts = []
-
-        for p in tree_path:
-            if hasattr(p, "name"):
-                path_parts.append(p.name)
-            elif hasattr(p, "idx"):
-                path_parts.append(str(p.idx))
-            else:
-                raise ValueError(f"Don't know how to deal with tree path part {p}")
-
-        path_str = ".".join(path_parts)
+        path_str = tree_path_to_str(tree_path)
 
         if path_str not in state_dict:
             raise ValueError(f"state dict is missing key {path_str}")
@@ -103,16 +109,6 @@ def load_state_dict(
                 raise ValueError(f"Expected {type(value)}, found {new_value}")
 
             new_value = new_value.item()
-        # elif isinstance(value, float):
-        #     if new_value.shape != ():
-        #         raise ValueError(f"Expected float, found {new_value}")
-
-        #     new_value = new_value.item()
-        # elif isinstance(value, bool):
-        #     if new_value.shape != ():
-        #         raise ValueError(f"Expected bool, found {new_value}")
-
-        #     new_value = new_value.item()
         elif eqx.is_array(new_value) and new_value.shape != value.shape:
             raise ValueError(
                 f"array at path {path_str} have different shapes: "
