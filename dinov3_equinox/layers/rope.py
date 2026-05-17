@@ -113,7 +113,7 @@ class RopePositionEmbedding(eqx.Module):
 
             periods /= base  # [min_period / max_period, 1]
 
-            periods *= self.max_period  # [min_period, max_period]
+            periods *= max_period  # [min_period, max_period]
 
             self.periods = periods
 
