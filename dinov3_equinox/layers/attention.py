@@ -44,6 +44,8 @@ class LinearKMaskedBias(eqx.Module):
         x = self.weight @ x
 
         if self.bias is not None:
+            assert self.bias_mask is not None
+
             x += self.bias * jax.lax.stop_gradient(self.bias_mask)
 
         return x
