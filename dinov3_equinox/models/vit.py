@@ -8,6 +8,7 @@ import equinox.nn as nn
 import jax
 import jax.numpy as jnp
 import jax.random as jr
+import jax.tree as jt
 from chex import assert_axis_dimension, assert_rank
 
 from dinov3_equinox.layers.block import SelfAttentionBlock
@@ -177,14 +178,18 @@ class DinoVisionTransformer(eqx.Module):
 
         rope = self.rope_embed(H=H, W=W)
 
-        hiddens = [x]
+        x_in = x
 
-        for block in self.blocks:
+        def scan_fn(x, block):
             x = block(x, rope=rope)
 
-            hiddens.append(x)
+            return x, x
 
-        hiddens = jnp.stack(hiddens, axis=0)
+        x: Array
+        hiddens: Array
+        x, hiddens = jax.lax.scan(scan_fn, x, jt.map(lambda *xs: jnp.stack(xs), *self.blocks))
+
+        hiddens = jnp.concat([x_in[None, ...], hiddens])
 
         if self.untie_cls_and_patch_norms:
             assert self.cls_norm is not None
