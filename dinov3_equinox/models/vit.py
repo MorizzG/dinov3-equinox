@@ -38,7 +38,7 @@ class DinoVisionTransformer(eqx.Module):
 
     rope_embed: RopePositionEmbedding
 
-    blocks: list[SelfAttentionBlock]
+    blocks: SelfAttentionBlock
 
     norm: nn.LayerNorm
 
@@ -124,23 +124,26 @@ class DinoVisionTransformer(eqx.Module):
             dtype=STR_TO_DTYPE[pos_embed_rope_dtype],
         )
 
-        self.blocks = [
-            SelfAttentionBlock(
-                dim=embed_dim,
-                num_heads=num_heads,
-                ffn_ratio=ffn_ratio,
-                qkv_bias=qkv_bias,
-                proj_bias=proj_bias,
-                ffn_bias=ffn_bias,
-                norm_layer=norm_layer,
-                act_layer="gelu",
-                ffn_layer=ffn_layer,
-                init_value=layerscale_init,
-                mask_k_bias=mask_k_bias,
-                key=consume(),
-            )
-            for i in range(depth)
-        ]
+        self.blocks = jt.map(
+            lambda *xs: jnp.stack(xs),
+            *[
+                SelfAttentionBlock(
+                    dim=embed_dim,
+                    num_heads=num_heads,
+                    ffn_ratio=ffn_ratio,
+                    qkv_bias=qkv_bias,
+                    proj_bias=proj_bias,
+                    ffn_bias=ffn_bias,
+                    norm_layer=norm_layer,
+                    act_layer="gelu",
+                    ffn_layer=ffn_layer,
+                    init_value=layerscale_init,
+                    mask_k_bias=mask_k_bias,
+                    key=consume(),
+                )
+                for i in range(depth)
+            ],
+        )
 
         self.norm = make_norm_layer(norm_layer, embed_dim)
 
@@ -187,7 +190,7 @@ class DinoVisionTransformer(eqx.Module):
 
         x: Array
         hiddens: Array
-        x, hiddens = jax.lax.scan(scan_fn, x, jt.map(lambda *xs: jnp.stack(xs), *self.blocks))
+        x, hiddens = jax.lax.scan(scan_fn, x, self.blocks)
 
         hiddens = jnp.concat([x_in[None, ...], hiddens])
 

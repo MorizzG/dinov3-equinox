@@ -35,6 +35,28 @@ def fix_state_dict(state_dict: dict[str, torch.Tensor]) -> dict[str, torch.Tenso
         assert key not in fixed_state_dict
         fixed_state_dict[key] = value
 
+    block_keys = [
+        key.removeprefix("blocks.0.") for key in state_dict.keys() if key.startswith("blocks.0.")
+    ]
+
+    for block_key in block_keys:
+        keys = [key for key in state_dict.keys() if key.endswith(block_key)]
+
+        def get_num(key: str) -> int:
+            assert key.startswith("blocks.") and key.endswith(block_key)
+
+            return int(key.removeprefix("blocks.").removesuffix("." + block_key))
+
+        keys = sorted(keys, key=get_num)
+
+        values = [fixed_state_dict.pop(key) for key in keys]
+
+        new_key = "blocks." + block_key
+
+        new_value = torch.stack(values)
+
+        fixed_state_dict[new_key] = new_value
+
     return fixed_state_dict
 
 
@@ -68,7 +90,9 @@ def convert_model(model_name: Model, weight_folder: Path, dest_folder: str, mmap
             # )
 
             state_dict = torch.load(
-                str(weight_folder / "dinov3_vit7b16_pretrain_lvd1689m-a955f4ea.pth"), mmap=mmap
+                str(weight_folder / "dinov3_vit7b16_pretrain_lvd1689m-a955f4ea.pth"),
+                map_location=torch.device("cpu"),
+                mmap=mmap,
             )
         case "vitb16":
             # dino = torch.hub.load(
@@ -78,7 +102,9 @@ def convert_model(model_name: Model, weight_folder: Path, dest_folder: str, mmap
             # )
 
             state_dict = torch.load(
-                str(weight_folder / "dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth"), mmap=mmap
+                str(weight_folder / "dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth"),
+                map_location=torch.device("cpu"),
+                mmap=mmap,
             )
         case "vith16plus":
             # dino = torch.hub.load(
@@ -88,7 +114,9 @@ def convert_model(model_name: Model, weight_folder: Path, dest_folder: str, mmap
             # )
 
             state_dict = torch.load(
-                str(weight_folder / "dinov3_vith16plus_pretrain_lvd1689m-7c1da9a5.pth"), mmap=mmap
+                str(weight_folder / "dinov3_vith16plus_pretrain_lvd1689m-7c1da9a5.pth"),
+                map_location=torch.device("cpu"),
+                mmap=mmap,
             )
         case "vitl16":
             # dino = torch.hub.load(
@@ -98,7 +126,9 @@ def convert_model(model_name: Model, weight_folder: Path, dest_folder: str, mmap
             # )
 
             state_dict = torch.load(
-                str(weight_folder / "dinov3_vitl16_pretrain_lvd1689m-8aa4cbdd.pth"), mmap=mmap
+                str(weight_folder / "dinov3_vitl16_pretrain_lvd1689m-8aa4cbdd.pth"),
+                map_location=torch.device("cpu"),
+                mmap=mmap,
             )
         # case "vitl16plus":
         #     dino = dinov3_vitl16plus(
@@ -113,7 +143,9 @@ def convert_model(model_name: Model, weight_folder: Path, dest_folder: str, mmap
             # )
 
             state_dict = torch.load(
-                str(weight_folder / "dinov3_vits16_pretrain_lvd1689m-08c60483.pth"), mmap=mmap
+                str(weight_folder / "dinov3_vits16_pretrain_lvd1689m-08c60483.pth"),
+                map_location=torch.device("cpu"),
+                mmap=mmap,
             )
         case "vits16plus":
             # dino = torch.hub.load(
@@ -123,14 +155,14 @@ def convert_model(model_name: Model, weight_folder: Path, dest_folder: str, mmap
             # )
 
             state_dict = torch.load(
-                str(weight_folder / "dinov3_vits16plus_pretrain_lvd1689m-4057cbaa.pth"), mmap=mmap
+                str(weight_folder / "dinov3_vits16plus_pretrain_lvd1689m-4057cbaa.pth"),
+                map_location=torch.device("cpu"),
+                mmap=mmap,
             )
         case _:
             raise ValueError(f"invalid model {model_name}")
 
     # assert isinstance(dino, torch.nn.Module)
-
-    return
 
     print("fixing state dict")
 
